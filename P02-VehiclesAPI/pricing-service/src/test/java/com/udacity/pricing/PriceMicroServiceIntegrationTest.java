@@ -29,8 +29,8 @@ public class PriceMicroServiceIntegrationTest {
 
     @Test
     public void getPrice() throws Exception{
-        ResponseEntity<List> responseEntity =
-        this.testRestTemplate.getForEntity("http://localhost:"+port+"/services/price?vehicleId=1", List.class);
+        ResponseEntity<String> responseEntity =
+        this.testRestTemplate.getForEntity("http://localhost:"+port+"/services/price?vehicleId=1", String.class);
 
         assertThat(responseEntity.getStatusCode(), equalTo(HttpStatus.OK));
     }

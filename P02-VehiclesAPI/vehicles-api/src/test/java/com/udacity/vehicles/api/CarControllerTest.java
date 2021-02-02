@@ -4,9 +4,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -30,9 +28,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 /**
  * Implements testing of the CarController class.
@@ -96,7 +96,14 @@ public class CarControllerTest {
          *   the whole list of vehicles. This should utilize the car from `getCar()`
          *   below (the vehicle will be the first in the list).
          */
-
+        Car car = getCar();
+        mvc.perform(
+                get("/cars"))
+                        .andExpect(status().isOk())
+                        .andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+                        .andExpect(content().json(
+                        "{}"
+                        ));
     }
 
     /**
@@ -109,6 +116,16 @@ public class CarControllerTest {
          * TODO: Add a test to check that the `get` method works by calling
          *   a vehicle by ID. This should utilize the car from `getCar()` below.
          */
+        Car car = getCar();
+        car.setId(1L);
+        mvc.perform(
+                get("/cars/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+                .andExpect(content().json(
+                        "{}"
+                ));
+
     }
 
     /**
@@ -122,6 +139,49 @@ public class CarControllerTest {
          *   when the `delete` method is called from the Car Controller. This
          *   should utilize the car from `getCar()` below.
          */
+        Car car = getCar();
+        car.setId(1L);
+        mvc.perform(delete("/cars/1"))
+                .andExpect(status().isNoContent());
+
+    }
+
+    /**
+     * Test the Updation of the information of a vehicle in the system.
+     * The ID number for which to update vehicle information.
+     * The updated information about the related vehicle
+     * */
+
+    @Test
+    public void updateCar() throws Exception {
+        /**
+         * TODO: Add a test to check whether a vehicle is appropriately updated
+         *   when the `Put` method is called from the Car Controller.
+         */
+        Car car = getCar();
+        car.setId(1L);
+        car.getDetails().setNumberOfDoors(2);
+//        car.getDetails().setFuelType("Gasoline");
+//        car.getDetails().setMileage(32280);
+//        car.getDetails().setExternalColor("white");
+//        car.getDetails().setModelYear(2020);
+//        car.getDetails().setBody("sedan");
+//        car.getDetails().setEngine("3.6L V6");
+
+        mvc.perform(
+                put("/cars/1")
+                        .content(json.write(car).getJson())
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.details.numberOfDoors", is(2)));
+//                .andExpect(jsonPath("$.details.fuelType", is("Gasoline")))
+//                .andExpect(jsonPath("$.details.mileage", is(32280)))
+//                .andExpect(jsonPath("$.details.externalColor", is("white")))
+//                .andExpect(jsonPath("$.details.modelYear", is(2018)))
+//                .andExpect(jsonPath("$.details.body", is("sedan")))
+//                .andExpect(jsonPath("$.details.engine", is("3.6L V6")));
+        System.out.println("");
     }
 
     /**
