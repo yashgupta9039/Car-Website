@@ -8,6 +8,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import com.udacity.vehicles.client.maps.MapsClient;
 import com.udacity.vehicles.client.prices.PriceClient;
@@ -104,6 +106,7 @@ public class CarControllerTest {
                         .andExpect(content().json(
                         "{}"
                         ));
+        verify(carService, times(1)).list();
     }
 
     /**
@@ -125,7 +128,7 @@ public class CarControllerTest {
                 .andExpect(content().json(
                         "{}"
                 ));
-
+        verify(carService, times(1)).list();
     }
 
     /**
@@ -144,6 +147,7 @@ public class CarControllerTest {
         mvc.perform(delete("/cars/1"))
                 .andExpect(status().isNoContent());
 
+        verify(carService, times(1)).delete(1l);
     }
 
     /**
@@ -160,28 +164,17 @@ public class CarControllerTest {
          */
         Car car = getCar();
         car.setId(1L);
-        car.getDetails().setNumberOfDoors(2);
-//        car.getDetails().setFuelType("Gasoline");
-//        car.getDetails().setMileage(32280);
-//        car.getDetails().setExternalColor("white");
-//        car.getDetails().setModelYear(2020);
-//        car.getDetails().setBody("sedan");
-//        car.getDetails().setEngine("3.6L V6");
 
         mvc.perform(
                 put("/cars/1")
                         .content(json.write(car).getJson())
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .accept(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.details.numberOfDoors", is(2)));
-//                .andExpect(jsonPath("$.details.fuelType", is("Gasoline")))
-//                .andExpect(jsonPath("$.details.mileage", is(32280)))
-//                .andExpect(jsonPath("$.details.externalColor", is("white")))
-//                .andExpect(jsonPath("$.details.modelYear", is(2018)))
-//                .andExpect(jsonPath("$.details.body", is("sedan")))
-//                .andExpect(jsonPath("$.details.engine", is("3.6L V6")));
-        System.out.println("");
+                        .andExpect(status().isOk())
+                        .andExpect(content().json(
+                        "{}"
+                        ));
+
     }
 
     /**
